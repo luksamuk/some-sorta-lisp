@@ -3,9 +3,8 @@
 
 #include "types.h"
 
-list_area_t    make_list_area();
+void           init_list_area(list_area_t *area_ptr);
 void           print_list_area(list_area_t *area);
-void           clear_list_area(list_area_t *area);
 lisp_untptr_t  make_cons_cell(list_area_t *area, lisp_ptr_t car, lisp_ptr_t cdr);
 
 #endif

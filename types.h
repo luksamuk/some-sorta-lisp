@@ -2,6 +2,7 @@
 #define LISP_TYPES_H
 
 #include <stdint.h>
+#include "def.h"
 
 /// Possible types for typed pointers.
 /// Should have the size of an uint8_t.
@@ -38,25 +39,25 @@ typedef struct ATOM_TABLE_ENTRY_T {
     lisp_untptr_t  bindlist;
 } atom_table_entry_t;
 
-/// Structure holding the state of an atom table
-typedef struct ATOM_TABLE_T {
-    lisp_untptr_t       last;
-    atom_table_entry_t *table_ptr;
-} atom_table_t;
-
-
-const char *type_repr_str(datatype_t type);
-
 /// Single memory cell of list area
 typedef struct CELL_T {
     lisp_ptr_t car;
     lisp_ptr_t cdr;
 } cell_t;
 
+/// Structure holding the state of an atom table
+typedef struct ATOM_TABLE_T {
+    lisp_untptr_t       last;
+    atom_table_entry_t  table_ptr[ATOM_TABLE_SIZE];
+} atom_table_t;
+
 /// List area representation
 typedef struct LIST_AREA_T {
     lisp_untptr_t  last;
-    cell_t        *area_ptr;
+    cell_t         area_ptr[LIST_AREA_SIZE];
 } list_area_t;
+
+
+const char *type_repr_str(datatype_t type);
 
 #endif

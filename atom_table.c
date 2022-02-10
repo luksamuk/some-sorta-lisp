@@ -11,20 +11,10 @@
 #include "pointers.h"
 #include "atom_table.h"
 
-atom_table_t
-make_atom_table()
+void
+init_atom_table(atom_table_t *table_ptr)
 {
-    size_t byte_size = ATOM_TABLE_SIZE * sizeof(atom_table_entry_t);
-    dbg("starting atom table with %lu cells (%lu bytes).\n",
-        ATOM_TABLE_SIZE, byte_size);
-    atom_table_entry_t *table_ptr = malloc(byte_size);
-    memset(table_ptr, 0, byte_size);
-
-    atom_table_t table;
-    table.table_ptr = table_ptr;
-    table.last = 0;
-
-    return table;
+    memset(table_ptr, 0, sizeof(atom_table_t));
 }
 
 void
@@ -35,7 +25,7 @@ clear_atom_table(atom_table_t *table)
         free(table->table_ptr[current].name);
         current++;
     }
-    free(table->table_ptr);
+    table->last = 0;
 }
 
 void

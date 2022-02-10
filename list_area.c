@@ -8,22 +8,10 @@
 #include "pointers.h"
 #include "list_area.h"
 
-list_area_t
-make_list_area()
+void
+init_list_area(list_area_t *area_ptr)
 {
-    size_t byte_size = LIST_AREA_SIZE * sizeof(cell_t);
-
-    dbg("starting list area with %lu cells (%lu bytes).\n",
-        LIST_AREA_SIZE, byte_size);
-
-    cell_t *area_ptr = malloc(byte_size);
-    memset(area_ptr, 0, byte_size);
-    
-    list_area_t area;
-    area.last = 0;
-    area.area_ptr = area_ptr;
-
-    return area;
+    memset(area_ptr, 0, sizeof(list_area_t));
 }
 
 void
@@ -51,12 +39,6 @@ print_list_area(list_area_t *area)
                get_ptr_content(cell->cdr));
         current++;
     }
-}
-
-void
-clear_list_area(list_area_t *area)
-{
-    free(area->area_ptr);
 }
 
 lisp_untptr_t

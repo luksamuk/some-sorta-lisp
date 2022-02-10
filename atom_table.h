@@ -3,8 +3,8 @@
 
 #include "types.h"
 
-atom_table_t make_atom_table();
-void         clear_atom_table(atom_table_t *table);
-void         print_atom_table(atom_table_t *table);
+void init_atom_table(atom_table_t *table_ptr);
+void clear_atom_table(atom_table_t *table);
+void print_atom_table(atom_table_t *table);
 
 #endif
