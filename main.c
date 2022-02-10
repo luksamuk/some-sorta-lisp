@@ -5,6 +5,7 @@
 #include "types.h"
 #include "atom_table.h"
 #include "atom.h"
+#include "pointers.h"
 #include "list_area.h"
 #include "printing.h"
 

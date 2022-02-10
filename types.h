@@ -24,6 +24,12 @@ typedef uint8_t datatype_t;
 /// Generic untyped pointer
 typedef uint32_t lisp_untptr_t;
 
+/// Typed pointer to object in list area
+typedef uint32_t lisp_ptr_t;
+
+/// MSB of typed pointer representing the type tag
+typedef uint8_t  lisp_ptr_tag_t;
+
 /// Structure of a single entry on the atom table
 typedef struct ATOM_TABLE_ENTRY_T {
     char          *name;
@@ -41,12 +47,6 @@ typedef struct ATOM_TABLE_T {
 
 
 const char *type_repr_str(datatype_t type);
-
-/// Typed pointer to object in list area
-typedef uint32_t lisp_ptr_t;
-
-/// MSB of typed pointer representing the type tag
-typedef uint8_t  lisp_ptr_tag_t;
 
 /// Single memory cell of list area
 typedef struct CELL_T {
