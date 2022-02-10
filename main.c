@@ -16,6 +16,18 @@ void
 main()
 {
     lisp_vm_t *vm = make_lisp_vm();
+
+    dbg("atom table entry size: %lu bits\n", sizeof(atom_table_entry_t) * 8);
+    dbg("cell size: %lu bits\n", sizeof(cell_t) * 8);
+    dbg("atom table size: %lu bytes (approx. %lu MB)\n",
+        sizeof(atom_table_t), sizeof(atom_table_t) / 1024 / 1024);
+    dbg("list area size: %lu bytes (approx. %lu MB)\n",
+        sizeof(list_area_t), sizeof(list_area_t) / 1024 / 1024);
+    dbg("lisp vm size: %lu bytes (approx. %lu MB)\n",
+        sizeof(lisp_vm_t), sizeof(lisp_vm_t) / 1024 / 1024);
+    dbg("total atom table entries: %lu\n", ATOM_TABLE_SIZE);
+    dbg("total list area cells: %lu\n", LIST_AREA_SIZE);
+    dbg("\n");
     
     lisp_untptr_t a_nil     = make_atom(&vm->table, "nil");
     lisp_untptr_t a_t       = make_atom(&vm->table, "t");

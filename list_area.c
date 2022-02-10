@@ -20,10 +20,10 @@ print_list_area(list_area_t *area)
     uint32_t current = 0;
     while(current < area->last) {
         if(current % 100 == 0) {
-            printf("\n%5s | %14s | %14s\n",
+            printf("\n%6s | %14s | %14s\n",
                    "ADDR", "CAR", "CDR");
             int i = 0;
-            while(i < 39) {
+            while(i < 40) {
                 putchar('-');
                 i++;
             }
@@ -31,7 +31,7 @@ print_list_area(list_area_t *area)
         }
 
         cell_t *cell = &area->area_ptr[current];
-        printf("%05X | %5s | %06X | %0s | %06X\n",
+        printf("%06X | %5s | %06X | %0s | %06X\n",
                current,
                type_repr_str(get_ptr_tag(cell->car)),
                get_ptr_content(cell->car),

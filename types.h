@@ -34,6 +34,7 @@ typedef uint8_t  lisp_ptr_tag_t;
 /// Structure of a single entry on the atom table
 typedef struct ATOM_TABLE_ENTRY_T {
     char          *name;
+    lisp_untptr_t  __unused;
     lisp_ptr_t     value;
     lisp_untptr_t  plist;
     lisp_untptr_t  bindlist;
@@ -48,12 +49,14 @@ typedef struct CELL_T {
 /// Structure holding the state of an atom table
 typedef struct ATOM_TABLE_T {
     lisp_untptr_t       last;
+    lisp_untptr_t       __unused;
     atom_table_entry_t  table_ptr[ATOM_TABLE_SIZE];
 } atom_table_t;
 
 /// List area representation
 typedef struct LIST_AREA_T {
     lisp_untptr_t  last;
+    lisp_untptr_t  __unused;
     cell_t         area_ptr[LIST_AREA_SIZE];
 } list_area_t;
 
