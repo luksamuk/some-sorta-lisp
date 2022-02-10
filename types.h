@@ -33,8 +33,7 @@ typedef uint8_t  lisp_ptr_tag_t;
 /// Structure of a single entry on the atom table
 typedef struct ATOM_TABLE_ENTRY_T {
     char          *name;
-    datatype_t     type;
-    lisp_untptr_t  value;
+    lisp_ptr_t     value;
     lisp_untptr_t  plist;
     lisp_untptr_t  bindlist;
 } atom_table_entry_t;

@@ -30,13 +30,13 @@ main()
     lisp_untptr_t a_label   = make_atom(&table, "label");
     lisp_untptr_t a_special = make_atom(&table, "special");
 
-    // Self-evaluating atoms NIL and T
-    bind_atom(&table, a_nil, TYPE_ATOM, a_nil);
-    bind_atom(&table, a_t, TYPE_ATOM, a_t);
-
     // Create pointers to NIL and T
     lisp_ptr_t p_nil = make_pointer(TYPE_ATOM, a_nil);
     lisp_ptr_t p_t   = make_pointer(TYPE_ATOM, a_t);
+
+    // Self-evaluating atoms NIL and T
+    bind_atom(&table, a_nil, p_nil);
+    bind_atom(&table, a_t, p_t);
     
     // v[MY-ATOM] = (5 . T)
     {
@@ -44,7 +44,7 @@ main()
         lisp_untptr_t v_myatom = make_cons_cell(&area,
                                                 make_pointer(TYPE_NUMBER, 5),
                                                 p_t);
-        bind_atom(&table, a_myatom, TYPE_CONS, v_myatom);
+        bind_atom(&table, a_myatom, v_myatom);
 
         printf("v[(QUOTE MY-ATOM)] = ");
         print_object(&table, &area, make_pointer(TYPE_ATOM, a_myatom));
@@ -69,12 +69,17 @@ main()
                                 make_pointer(TYPE_CONS, v_test));
         
         lisp_untptr_t a_test = make_atom(&table, "test");
-        bind_atom(&table, a_test, TYPE_CONS, v_test);
+        bind_atom(&table, a_test, v_test);
 
         printf("v[LIST-TEST] = ");
         print_object(&table, &area, make_pointer(TYPE_CONS, v_test));
         putchar(10);
     }
+
+    // v[NUMBER] = 93
+    bind_atom(&table,
+              make_atom(&table, "number"),
+              make_pointer(TYPE_NUMBER, 5));
 
     printf("v[T] = ");
     print_object(&table, &area, p_t);

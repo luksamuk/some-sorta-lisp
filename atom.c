@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "atom.h"
+#include "pointers.h"
 
 char *
 make_atom_name(const char *given_name)
@@ -27,7 +28,6 @@ make_atom(atom_table_t *table, const char *atom_name)
     table->last++;
     atom_table_entry_t *entry = &table->table_ptr[atom_addr];
     entry->name = make_atom_name(atom_name);
-    entry->type = TYPE_UNDEFINED;
     entry->value = entry->plist = entry->bindlist = 0;
     return atom_addr;
 }
@@ -35,14 +35,13 @@ make_atom(atom_table_t *table, const char *atom_name)
 lisp_untptr_t
 bind_atom(
     atom_table_t *table,
-    lisp_untptr_t atom, datatype_t type, lisp_untptr_t value)
+    lisp_untptr_t atom, lisp_ptr_t value)
 {
     if(atom >= table->last)
         return 0;
     atom_table_entry_t *entry = &table->table_ptr[atom];
-    entry->type = type;
     entry->value = value;
-    return atom; // TODO: Return value directly?
+    return entry->value;
 }
 
 const char *
