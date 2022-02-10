@@ -6,30 +6,8 @@
 #include "atom_table.h"
 #include "atom.h"
 #include "list_area.h"
+#include "printing.h"
 
-void
-print_object(atom_table_t *table, list_area_t *area, lisp_ptr_t ptr)
-{
-    lisp_ptr_tag_t tag  = get_ptr_tag(ptr);
-    uint32_t       cont = get_ptr_content(ptr);
-
-    switch(tag) {
-    case TYPE_NUMBER:
-        printf("%d", cont);
-        break;
-    case TYPE_VARIABLE:
-        printf("%s", get_atom_name(table, cont));
-        break;
-    case TYPE_CONS:
-        putchar('(');
-        print_object(table, area, area->area_ptr[cont].car);
-        printf(" . ");
-        print_object(table, area, area->area_ptr[cont].cdr);
-        putchar(')');
-        break;
-    default: break;
-    }
- }
 
 void
 main()
@@ -52,12 +30,12 @@ main()
     lisp_untptr_t a_special = make_atom(&table, "special");
 
     // Self-evaluating atoms NIL and T
-    bind_atom(&table, a_nil, TYPE_VARIABLE, a_nil);
-    bind_atom(&table, a_t, TYPE_VARIABLE, a_t);
+    bind_atom(&table, a_nil, TYPE_ATOM, a_nil);
+    bind_atom(&table, a_t, TYPE_ATOM, a_t);
 
     // Create pointers to NIL and T
-    lisp_ptr_t p_nil = make_pointer(TYPE_VARIABLE, a_nil);
-    lisp_ptr_t p_t   = make_pointer(TYPE_VARIABLE, a_t);
+    lisp_ptr_t p_nil = make_pointer(TYPE_ATOM, a_nil);
+    lisp_ptr_t p_t   = make_pointer(TYPE_ATOM, a_t);
     
     // v[MY-ATOM] = (5 . T)
     {
@@ -68,7 +46,7 @@ main()
         bind_atom(&table, a_myatom, TYPE_CONS, v_myatom);
 
         printf("v[(QUOTE MY-ATOM)] = ");
-        print_object(&table, &area, make_pointer(TYPE_VARIABLE, a_myatom));
+        print_object(&table, &area, make_pointer(TYPE_ATOM, a_myatom));
         putchar(10);
         
         printf("v[MY-ATOM] = ");

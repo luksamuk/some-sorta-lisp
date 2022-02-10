@@ -8,7 +8,7 @@
 enum DATATYPES {
     TYPE_UNDEFINED        = 0x0,
     TYPE_CONS             = 0x1,
-    TYPE_VARIABLE         = 0x8,
+    TYPE_ATOM             = 0x8,
     TYPE_NUMBER           = 0x9,
     TYPE_BUILTIN_FUNCTION = 0xa,
     TYPE_BUILTIN_SPECIAL  = 0xb,
