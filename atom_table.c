@@ -46,7 +46,7 @@ print_atom_table(atom_table_t *table)
         }
         
         atom_table_entry_t *entry = &table->table_ptr[current];
-        printf("%06X | %15s | %5s | %06lu | %05X | %05X\n",
+        printf("%06X | %15s | %5s | %06X | %05X | %05X\n",
                current,
                entry->name,
                type_repr_str(get_ptr_tag(entry->value)),

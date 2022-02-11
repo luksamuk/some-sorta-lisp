@@ -28,7 +28,8 @@ main()
     dbg("total atom table entries: %lu\n", ATOM_TABLE_SIZE);
     dbg("total list area cells: %lu\n", LIST_AREA_SIZE);
     dbg("\n");
-    
+
+    // Create atoms
     lisp_untptr_t a_nil     = make_atom(&vm->table, "nil");
     lisp_untptr_t a_t       = make_atom(&vm->table, "t");
     lisp_untptr_t a_quote   = make_atom(&vm->table, "quote");
@@ -42,9 +43,16 @@ main()
     lisp_untptr_t a_label   = make_atom(&vm->table, "label");
     lisp_untptr_t a_special = make_atom(&vm->table, "special");
 
-    // Create pointers to NIL and T
-    lisp_ptr_t p_nil = make_pointer(TYPE_ATOM, a_nil);
-    lisp_ptr_t p_t   = make_pointer(TYPE_ATOM, a_t);
+    // Create pointers
+    lisp_ptr_t p_nil    = make_pointer(TYPE_ATOM, a_nil);
+    lisp_ptr_t p_t      = make_pointer(TYPE_ATOM, a_t);
+    lisp_ptr_t p_quote  = make_pointer(TYPE_ATOM, a_quote);
+    lisp_ptr_t p_lambda = make_pointer(TYPE_ATOM, a_lambda);
+    lisp_ptr_t p_cond   = make_pointer(TYPE_ATOM, a_cond);
+    lisp_ptr_t p_atom   = make_pointer(TYPE_ATOM, a_atom);
+    lisp_ptr_t p_eq     = make_pointer(TYPE_ATOM, a_eq);
+    lisp_ptr_t p_cdr    = make_pointer(TYPE_ATOM, a_cdr);
+    lisp_ptr_t p_cons   = make_pointer(TYPE_ATOM, a_cons);
 
     // Self-evaluating atoms NIL and T
     bind_atom(&vm->table, a_nil, p_nil);
@@ -93,6 +101,60 @@ main()
               make_atom(&vm->table, "number"),
               make_pointer(TYPE_NUMBER, 5));
 
+    // This is a little bolder.
+    // v[A] = (LAMBDA () (CONS T (QUOTE B)))
+    lisp_untptr_t a_A = make_atom(&vm->table, "a");
+    lisp_untptr_t v_A;
+    {
+        lisp_ptr_t p_B = make_pointer(TYPE_ATOM, make_atom(&vm->table, "B"));
+        v_A = make_pointer(
+            TYPE_CONS,
+            make_cons_cell(
+                &vm->area,
+                p_lambda,
+                make_pointer(
+                    TYPE_CONS,
+                    make_cons_cell(
+                        &vm->area,
+                        p_nil,
+                        make_pointer(
+                            TYPE_CONS,
+                            make_cons_cell(
+                                &vm->area,
+                                make_pointer(
+                                    TYPE_CONS,
+                                    make_cons_cell(
+                                        &vm->area,
+                                        p_cons,
+                                        make_pointer(
+                                            TYPE_CONS,
+                                            make_cons_cell(
+                                                &vm->area,
+                                                p_t,
+                                                make_pointer(
+                                                    TYPE_CONS,
+                                                    make_cons_cell(
+                                                        &vm->area,
+                                                        make_pointer(
+                                                            TYPE_CONS,
+                                                            make_cons_cell(
+                                                                &vm->area,
+                                                                p_quote,
+                                                                make_pointer(
+                                                                    TYPE_CONS,
+                                                                    make_cons_cell(
+                                                                        &vm->area,
+                                                                        p_B, p_nil)))),
+                                                        p_nil)))))),
+                                p_nil))))));
+    }
+    lisp_ptr_t p_A = make_pointer(TYPE_CONS, v_A);
+    bind_atom(&vm->table, a_A, p_A);
+    
+    printf("v[A] = ");
+    print_object(&vm->table, &vm->area, p_A);
+    putchar(10);
+    
     printf("v[T] = ");
     print_object(&vm->table, &vm->area, p_t);
     putchar(10);
