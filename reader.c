@@ -138,3 +138,25 @@ read_expression(lisp_vm_t *vm, const char *text)
     list_dispose(&tokens);
     return expr;
 }
+
+char *
+slurp(const char *filename)
+{
+    char *buffer = NULL;
+    long length;
+    FILE *file = fopen(filename, "r");
+
+    if(!file)
+        return NULL;
+
+    fseek(file, 0, SEEK_END);
+    length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    buffer = malloc(length);
+    
+    if(buffer)
+        fread(buffer, 1, length, file);
+
+    fclose(file);
+    return buffer;
+}

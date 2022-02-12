@@ -58,11 +58,11 @@ debrief_vm(lisp_vm_t *vm)
     
     dbg("\nVM STATISTICS\n"
         "-------------\n"
-        "ATOM TABLE: %10luB / %10luB\n"
-        "LIST AREA:  %10luB / %10luB\n"
+        "ATOM TABLE: %10luB / %10luB (%lu atoms)\n"
+        "LIST AREA:  %10luB / %10luB (%lu cells)\n"
         "TOTAL SIZE: %10luB / %10luB\n\n",
-        used_atom_table, sizeof(atom_table_t),
-        used_list_area, sizeof(list_area_t),
+        used_atom_table, sizeof(atom_table_t), vm->table.last,
+        used_list_area, sizeof(list_area_t), vm->area.last,
         used_atom_table + used_list_area, total_size);
 }
 

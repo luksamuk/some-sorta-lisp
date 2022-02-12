@@ -21,26 +21,42 @@ main()
     lisp_vm_t *vm = make_lisp_vm();
     init_lisp_vm(vm);
 
+    {
+        // Slurp test file
+        char *testfile = slurp("test.l");
+        if(testfile) {
+            printf("Loading test.l...\n");
+            read_expression(vm, testfile);
+        }
+        free(testfile);
+    }
+
     char buffer[256];
     printf(
         "Type an S-Expression then press enter to echo.\n"
         "Use Ctrl+D to abort.\n");
-    while(fgets(buffer, sizeof buffer, stdin)) {
+    while(1) {
         putchar('>');
         putchar(' ');
-        print_object(&vm->table, &vm->area, read_expression(vm, buffer));
+        char *result = fgets(buffer, sizeof buffer, stdin);
+        if(!result) break;
+        print_object(&vm->table, &vm->area,
+                     read_expression(vm, buffer));
         putchar(10);
     }
     putchar(10);
 
+    debrief_vm(vm);
+    
+#ifdef NDEBUG
+    putchar(10);
     printf("ATOM TABLE\n----------\n");
     print_atom_table(&vm->table);
 
     putchar(10);
     printf("LIST AREA\n---------\n");
     print_list_area(&vm->area);
-
-    debrief_vm(vm);
+#endif
 
     clear_lisp_vm(vm);
     return 0;
