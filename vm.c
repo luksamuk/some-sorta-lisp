@@ -24,7 +24,7 @@ init_lisp_vm(lisp_vm_t *vm)
         "nil",
         "t",
         "quote",
-        "atom"
+        "atom",
         "eq",
         "car",
         "cdr",

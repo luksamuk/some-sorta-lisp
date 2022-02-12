@@ -16,14 +16,14 @@ int
 main()
 {
     printf("Lisp interpreter v0.0\n"
-           "Written by Lucas S. Vieira\n\n");
+           "Written by Lucas S. Vieira\n");
     
     lisp_vm_t *vm = make_lisp_vm();
     init_lisp_vm(vm);
 
     char buffer[256];
     printf(
-        "\nType an S-Expression then press enter to echo.\n"
+        "Type an S-Expression then press enter to echo.\n"
         "Use Ctrl+D to abort.\n");
     while(fgets(buffer, sizeof buffer, stdin)) {
         putchar('>');
