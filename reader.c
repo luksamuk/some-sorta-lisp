@@ -122,7 +122,7 @@ parse(lisp_vm_t *vm, list_t *tokens)
     }
     // TODO: If stack is not empty, we got unbalanced parentheses
     stack_dispose(&stack);
-    return get_car(&vm->area, get_ptr_content(curr));
+    return root;
 }
 
 lisp_ptr_t

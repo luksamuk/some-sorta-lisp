@@ -47,8 +47,6 @@ init_lisp_vm(lisp_vm_t *vm)
     // Bind NIL and T as self-evaluating atoms
     bind_atom(&vm->table, 0, make_pointer(TYPE_ATOM, 0));
     bind_atom(&vm->table, 1, make_pointer(TYPE_ATOM, 1));
-
-    debrief_vm(vm);
 }
 
 void

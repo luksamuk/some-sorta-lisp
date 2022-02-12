@@ -7,4 +7,6 @@
 lisp_ptr_t vm_lookup(lisp_vm_t *vm, lisp_ptr_t atom);
 lisp_ptr_t vm_proto_eval(lisp_vm_t *vm, lisp_ptr_t expr);
 
+void       vm_load_file(lisp_vm_t *vm, const char *filename);
+
 #endif
