@@ -42,6 +42,7 @@ main()
             putchar(10);
         } else if(!strcmp("#echo\n", result)) {
             echo_p = !echo_p;
+            printf("echo %s\n", echo_p ? "on" : "off");
         } else {
             lisp_ptr_t expr = read_expression(vm, buffer);
             if(echo_p) {
