@@ -8,5 +8,6 @@
 #define ATOM_TABLE_SIZE            3200000
 #define LIST_AREA_SIZE            10000000
 #define LISP_PTR_TAG_CLEAR_MASK 0xFF000000
+#define LISP_STACK_SIZE            8388608 // 8MB stack
 
 #endif

@@ -11,7 +11,7 @@
 #include "list_area.h"
 #include "pointers.h"
 #include "vm.h"
-#include "stack.h"
+#include "vm_stack.h"
 
 void
 append_token(const char *token_buffer, list_t *list)
@@ -52,17 +52,24 @@ lisp_ptr_t
 parse(lisp_vm_t *vm, list_t *tokens)
 {
     size_t i = 0;
+    lisp_ptr_t tp_underflow = find_atom(&vm->table, "stack-underflow");
+    lisp_ptr_t tp_base = find_atom(&vm->table, "base");
     lisp_ptr_t curr = TP_NIL;
     lisp_ptr_t root = TP_NIL;
-    
-    stack_t *stack = make_stack(sizeof(lisp_ptr_t));
+
+    if(vm_stack_push(vm, tp_base) != TP_T)
+        return find_atom(&vm->table, "stack-overflow");
     
     while(i < tokens->num_elements) {
         char *token = (char*)list_item_at(tokens, i);
         if(!strcmp(token, "(")) {
             // Push registers onto stack
-            stack_push(stack, &root);
-            stack_push(stack, &curr);
+            if((vm_stack_push(vm, root) != TP_T)
+               || (vm_stack_push(vm, curr) != TP_T)) {
+                vm_stack_unwind(vm, tp_base);
+                return find_atom(&vm->table, "stack-overflow");
+            }
+            
             curr = TP_NIL;
             root = TP_NIL;
         } else if(!strcmp(token, ")")) {
@@ -70,9 +77,13 @@ parse(lisp_vm_t *vm, list_t *tokens)
             lisp_ptr_t new, tmp;
             // Prepare list of accumulated elements to join parent
             new = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, root, TP_NIL));
+
             // Pop old curr into tmp
-            tmp = *((lisp_ptr_t*)stack_peek(stack));
-            stack_pop(stack);
+            tmp = vm_stack_pop(vm);
+            if(tmp == tp_underflow) {
+                vm_stack_unwind(vm, tp_base);
+                return tp_underflow;
+            }
             // If something was popped, set old curr's tail to
             // the list prepared earlier
             if(tmp != TP_NIL) {
@@ -82,8 +93,11 @@ parse(lisp_vm_t *vm, list_t *tokens)
             // as current tail
             curr = new;
             // Restore old root value
-            root = *((lisp_ptr_t*)stack_peek(stack));
-            stack_pop(stack);
+            root = vm_stack_pop(vm);
+            if(root == tp_underflow) {
+                vm_stack_unwind(vm, tp_base);
+                return tp_underflow;
+            }
             // If there is nothing on root, take curr as first element
             // of a newly created list
             if(root == TP_NIL) {
@@ -121,7 +135,7 @@ parse(lisp_vm_t *vm, list_t *tokens)
         i++;
     }
     // TODO: If stack is not empty, we got unbalanced parentheses
-    stack_dispose(&stack);
+    vm_stack_unwind(vm, tp_base);
     return root;
 }
 

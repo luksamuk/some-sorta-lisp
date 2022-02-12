@@ -26,6 +26,7 @@ main()
 
     char buffer[256];
     printf("Use Ctrl+D to abort.\n");
+    int echo_p = 0;
     while(1) {
         putchar('>');
         putchar(' ');
@@ -35,13 +36,19 @@ main()
             putchar(10);
             printf("ATOM TABLE\n----------\n");
             print_atom_table(&vm->table);
-            
             putchar(10);
             printf("LIST AREA\n---------\n");
             print_list_area(&vm->area);
             putchar(10);
+        } else if(!strcmp("#echo\n", result)) {
+            echo_p = !echo_p;
         } else {
             lisp_ptr_t expr = read_expression(vm, buffer);
+            if(echo_p) {
+                printf("# ");
+                print_object(&vm->table, &vm->area, expr);
+                putchar(10);
+            }
             expr = get_car(&vm->area, get_ptr_content(expr));
             lisp_ptr_t expr_eval = vm_proto_eval(vm, expr);
             print_object(&vm->table, &vm->area, expr_eval);

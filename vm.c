@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "vm.h"
 #include "util.h"
@@ -12,6 +13,7 @@ lisp_vm_t *
 make_lisp_vm()
 {
     lisp_vm_t *vm = malloc(sizeof(lisp_vm_t));
+    memset(&vm->registers, 0, sizeof(register_area_t));
     init_atom_table(&vm->table);
     init_list_area(&vm->area);
     return vm;
