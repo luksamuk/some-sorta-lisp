@@ -58,6 +58,7 @@ parse(lisp_vm_t *vm, list_t *tokens)
     lisp_ptr_t curr = TP_NIL;
     lisp_ptr_t root = TP_NIL;
 
+    lisp_untptr_t stack_pos = vm->stack.last;
     if(vm_stack_push(vm, tp_base) != TP_T)
         return make_pointer(TYPE_ATOM, find_atom(&vm->table, "stack-overflow"));
     
@@ -75,7 +76,6 @@ parse(lisp_vm_t *vm, list_t *tokens)
             curr = TP_NIL;
             root = TP_NIL;
         } else if(!strcmp(token, ")")) {
-            // TODO: This will fail if stack underflows!
             lisp_ptr_t new, tmp;
             // Prepare list of accumulated elements to join parent
             new = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, root, TP_NIL));
@@ -136,8 +136,10 @@ parse(lisp_vm_t *vm, list_t *tokens)
         }
         i++;
     }
-    // TODO: If stack is not empty, we got unbalanced parentheses
+    // If stack is not empty, we got unbalanced parentheses
     vm_stack_unwind(vm, tp_base);
+    if(stack_pos != vm->stack.last)
+        return make_pointer(TYPE_ATOM, find_atom(&vm->table, "unbalanced"));
     return root;
 }
 
