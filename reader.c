@@ -51,7 +51,6 @@ tokenize(const char *text, list_t *list)
 lisp_ptr_t
 parse(lisp_vm_t *vm, list_t *tokens)
 {
-    // BUG: Lists such as ((+ 1 2)) are reading as NIL
     size_t i = 0;
     lisp_ptr_t p_nil = make_pointer(TYPE_ATOM, find_atom(&vm->table, "nil"));
     lisp_ptr_t curr = p_nil;
