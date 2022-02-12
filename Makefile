@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -DNDEBUG
+CFLAGS=-g
 LFLAG=-c
 OUTFLAG=-o
 
@@ -9,8 +9,17 @@ BIN=lisp
 
 .PHONY: clean
 
-all: $(OBJ)
+all: dbg
+
+dbg: CFLAGS += -DNDEBUG -Wall -Wextra
+dbg: build
+
+release: CFLAGS += -O2 -Werr -Wextra
+release: build
+
+build: $(OBJ)
 	$(CC) $(CFLAGS) $^ $(OUTFLAG) $(BIN)
+
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(LFLAG) $< $(OUTFLAG) $@

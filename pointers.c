@@ -4,7 +4,7 @@ lisp_ptr_t
 make_pointer(lisp_ptr_tag_t tag, uint32_t value)
 {
     uint32_t clean_value = value ^ (value & LISP_PTR_TAG_CLEAR_MASK);
-    if(tag & TYPE_NUMBER != 0) {
+    if((tag & TYPE_NUMBER) != 0) {
         // Compensate signum
         uint32_t signum = value >> 31;
         clean_value |= (signum << 19);

@@ -18,6 +18,7 @@ make_atom_name(const char *given_name)
     for(i = 0; i < num_chars; i++) {
         name[i] = toupper(name[i]);
     }
+    name[num_chars] = '\0';
     return name;
 }
 

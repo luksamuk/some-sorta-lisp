@@ -11,6 +11,8 @@ typedef struct LISP_VM_T {
 } lisp_vm_t;
 
 lisp_vm_t *make_lisp_vm();
+void       init_lisp_vm(lisp_vm_t *vm);
+void       debrief_vm(lisp_vm_t *vm);
 void       clear_lisp_vm(lisp_vm_t *vm);
 
 #endif

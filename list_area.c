@@ -31,7 +31,7 @@ print_list_area(list_area_t *area)
         }
 
         cell_t *cell = &area->area_ptr[current];
-        printf("%06X | %5s | %06X | %0s | %06X\n",
+        printf("%06X | %5s | %06X | %5s | %06X\n",
                current,
                type_repr_str(get_ptr_tag(cell->car)),
                get_ptr_content(cell->car),
@@ -52,4 +52,32 @@ make_cons_cell(list_area_t *area, lisp_ptr_t car, lisp_ptr_t cdr)
     cell_ptr->cdr = cdr;
 
     return current;
+}
+
+void
+cell_set_car(list_area_t *area, lisp_untptr_t ptr, lisp_ptr_t value)
+{
+    cell_t *cell_ptr = &area->area_ptr[ptr];
+    cell_ptr->car = value;
+}
+
+void
+cell_set_cdr(list_area_t *area, lisp_untptr_t ptr, lisp_ptr_t value)
+{
+    cell_t *cell_ptr = &area->area_ptr[ptr];
+    cell_ptr->cdr = value;
+}
+
+lisp_ptr_t
+get_car(list_area_t *area, lisp_untptr_t ptr)
+{
+    cell_t *cell_ptr = &area->area_ptr[ptr];
+    return cell_ptr->car;
+}
+
+lisp_ptr_t
+get_cdr(list_area_t *area, lisp_untptr_t ptr)
+{
+    cell_t *cell_ptr = &area->area_ptr[ptr];
+    return cell_ptr->cdr;
 }

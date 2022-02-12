@@ -8,6 +8,7 @@
 #include "def.h"
 #include "util.h"
 #include "types.h"
+#include "atom.h"
 #include "pointers.h"
 #include "atom_table.h"
 
@@ -57,3 +58,22 @@ print_atom_table(atom_table_t *table)
     }
 }
 
+lisp_untptr_t
+find_atom(atom_table_t *table, const char *name)
+{
+    // Linear search...
+    // I promes I'll improve this, but we'll need
+    // some sort of map or compact radix tree to do
+    // that! I'm still sorting it out.
+    lisp_untptr_t current = 0;
+    char *correct_name = make_atom_name(name);
+    while(current < table->last) {
+        if(strcmp(get_atom_name(table, current), correct_name) == 0) {
+            free(correct_name);
+            return current;
+        }
+        current++;
+    }
+    free(correct_name);
+    return make_atom(table, name);
+}
