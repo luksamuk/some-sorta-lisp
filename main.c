@@ -11,6 +11,7 @@
 #include "printing.h"
 #include "vm.h"
 #include "reader.h"
+#include "eval.h"
 
 int
 main()
@@ -40,8 +41,9 @@ main()
         putchar(' ');
         char *result = fgets(buffer, sizeof buffer, stdin);
         if(!result) break;
-        print_object(&vm->table, &vm->area,
-                     read_expression(vm, buffer));
+        lisp_ptr_t expr = read_expression(vm, buffer);
+        lisp_ptr_t expr_eval = vm_proto_eval(vm, expr);
+        print_object(&vm->table, &vm->area, expr_eval);
         putchar(10);
     }
     putchar(10);

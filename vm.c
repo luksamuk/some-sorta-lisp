@@ -21,6 +21,7 @@ void
 init_lisp_vm(lisp_vm_t *vm)
 {
     const char *PRIMITIVE_ATOMS[] = {
+        // DO NOT change the order!
         "nil",
         "t",
         "quote",
@@ -33,6 +34,7 @@ init_lisp_vm(lisp_vm_t *vm)
         "lambda",
         "label",
         "special",
+        "undefined",
         NULL
     };
     

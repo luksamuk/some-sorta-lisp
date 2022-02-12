@@ -52,9 +52,8 @@ lisp_ptr_t
 parse(lisp_vm_t *vm, list_t *tokens)
 {
     size_t i = 0;
-    lisp_ptr_t p_nil = make_pointer(TYPE_ATOM, find_atom(&vm->table, "nil"));
-    lisp_ptr_t curr = p_nil;
-    lisp_ptr_t root = p_nil;
+    lisp_ptr_t curr = TP_NIL;
+    lisp_ptr_t root = TP_NIL;
     
     stack_t *stack = make_stack(sizeof(lisp_ptr_t));
     
@@ -64,19 +63,19 @@ parse(lisp_vm_t *vm, list_t *tokens)
             // Push registers onto stack
             stack_push(stack, &root);
             stack_push(stack, &curr);
-            curr = p_nil;
-            root = p_nil;
+            curr = TP_NIL;
+            root = TP_NIL;
         } else if(!strcmp(token, ")")) {
             // TODO: This will fail if stack underflows!
             lisp_ptr_t new, tmp;
             // Prepare list of accumulated elements to join parent
-            new = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, root, p_nil));
+            new = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, root, TP_NIL));
             // Pop old curr into tmp
             tmp = *((lisp_ptr_t*)stack_peek(stack));
             stack_pop(stack);
             // If something was popped, set old curr's tail to
             // the list prepared earlier
-            if(tmp != p_nil) {
+            if(tmp != TP_NIL) {
                 cell_set_cdr(&vm->area, get_ptr_content(tmp), new);
             }
             // Continue accumulating elements with the prepared list
@@ -87,7 +86,7 @@ parse(lisp_vm_t *vm, list_t *tokens)
             stack_pop(stack);
             // If there is nothing on root, take curr as first element
             // of a newly created list
-            if(root == p_nil) {
+            if(root == TP_NIL) {
                 root = curr;
             }
         } else if(isdigit(token[0])
@@ -96,8 +95,8 @@ parse(lisp_vm_t *vm, list_t *tokens)
             // Generate number
             new = make_pointer(TYPE_NUMBER, atoi(token));
             // Put number onto a new cell head
-            tmp = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, new, p_nil));
-            if(curr != p_nil) {
+            tmp = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, new, TP_NIL));
+            if(curr != TP_NIL) {
                 // If curr is a cell, set its tail to the new cell
                 cell_set_cdr(&vm->area, get_ptr_content(curr), tmp);
             } else {
@@ -112,8 +111,8 @@ parse(lisp_vm_t *vm, list_t *tokens)
             new = make_pointer(TYPE_ATOM, find_atom(&vm->table, token));
             // Append new atom onto Lisp list.
             // Works much like number parsing. See it for details
-            cell = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, new, p_nil));
-            if(curr != p_nil)
+            cell = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, new, TP_NIL));
+            if(curr != TP_NIL)
                 cell_set_cdr(&vm->area, get_ptr_content(curr), cell);
             else
                 root = cell;

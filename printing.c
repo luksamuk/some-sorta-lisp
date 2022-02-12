@@ -13,6 +13,9 @@ print_object(atom_table_t *table, list_area_t *area, lisp_ptr_t ptr)
     uint32_t       cont = get_ptr_content(ptr);
 
     switch(tag) {
+    case TYPE_UNDEFINED:
+        printf("<UNDEFINED>");
+        break;
     case TYPE_NUMBER:
         printf("%d", cont);
         break;

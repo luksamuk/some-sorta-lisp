@@ -3,21 +3,7 @@
 
 #include <stdint.h>
 #include "def.h"
-
-/// Possible types for typed pointers.
-/// Should have the size of an uint8_t.
-enum DATATYPES {
-    TYPE_UNDEFINED        = 0x0,
-    TYPE_CONS             = 0x1,
-    TYPE_ATOM             = 0x8,
-    TYPE_NUMBER           = 0x9,
-    TYPE_BUILTIN_FUNCTION = 0xa,
-    TYPE_BUILTIN_SPECIAL  = 0xb,
-    TYPE_FUNCTION         = 0xc,
-    TYPE_SPECIAL          = 0xd,
-    TYPE_LAMBDA_FUNCTION  = 0xe,
-    TYPE_LAMBDA_SPECIAL   = 0xf,
-};
+#include "constants.h"
 
 /// Type representing datatypes in general
 typedef uint8_t datatype_t;
