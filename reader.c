@@ -86,23 +86,28 @@ parse(lisp_vm_t *vm, list_t *tokens)
             // Restore old root value
             root = *((lisp_ptr_t*)stack_peek(stack));
             stack_pop(stack);
+            // If there is nothing on root, take curr as first element
+            // of a newly created list
+            if(root == p_nil) {
+                root = curr;
+            }
         } else if(isdigit(token[0])
                   || ((token[0] == '-') && isdigit(token[1]))) {
-            lisp_ptr_t new, cell;
+            lisp_ptr_t new, tmp;
             // Generate number
             new = make_pointer(TYPE_NUMBER, atoi(token));
             // Put number onto a new cell head
-            cell = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, new, p_nil));
+            tmp = make_pointer(TYPE_CONS, make_cons_cell(&vm->area, new, p_nil));
             if(curr != p_nil) {
                 // If curr is a cell, set its tail to the new cell
-                cell_set_cdr(&vm->area, get_ptr_content(curr), cell);
+                cell_set_cdr(&vm->area, get_ptr_content(curr), tmp);
             } else {
                 // Otherwise, since curr will be set for the first time,
                 // update the root as well so we don't lose its reference
-                root = cell;
+                root = tmp;
             }
             // Set curr to newly created cell
-            curr = cell;
+            curr = tmp;
         } else {
             lisp_ptr_t new, cell;
             new = make_pointer(TYPE_ATOM, find_atom(&vm->table, token));
