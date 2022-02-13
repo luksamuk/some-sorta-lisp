@@ -28,15 +28,28 @@ vm_proto_eval(lisp_vm_t *vm, lisp_ptr_t expr)
     // otherwise spit expression in verbatim
 
     switch(get_ptr_tag(expr)) {
-    case TYPE_ATOM: return vm_lookup(vm, expr);
-    case TYPE_NUMBER: return expr;
+    case TYPE_ATOM:
+        return vm_lookup(vm, expr);
+    case TYPE_NUMBER:
+        return expr;
     case TYPE_CONS:
-        if(get_car(&vm->area, get_ptr_content(expr)) == TP_QUOTE) {
+        switch(get_car(&vm->area, get_ptr_content(expr))) {
+        case TP_QUOTE:
             return get_car(
                 &vm->area,
                 get_ptr_content(
                     get_cdr(&vm->area, get_ptr_content(expr))));
-        } else {
+        case TP_LAMBDA:
+            // #<CONS (LAMBDA ARGS BODY)> => #<LAMBDA (ARGS BODY)>
+            return make_pointer(
+                TYPE_FUNCTION,
+                get_ptr_content(get_cdr(&vm->area, get_ptr_content(expr))));
+        case TP_SPECIAL:
+            // #<CONS (SPECIAL ARGS BODY)> => #<SPECIAL (ARGS BODY)>
+            return make_pointer(
+                TYPE_FUNCTION,
+                get_ptr_content(get_cdr(&vm->area, get_ptr_content(expr))));
+        default:
             return expr;
         }
         break;

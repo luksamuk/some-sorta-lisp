@@ -12,8 +12,6 @@ enum DATATYPE {
     TYPE_BUILTIN_SPECIAL  = 0xb,
     TYPE_FUNCTION         = 0xc,
     TYPE_SPECIAL          = 0xd,
-    TYPE_LAMBDA_FUNCTION  = 0xe,
-    TYPE_LAMBDA_SPECIAL   = 0xf,
 };
 
 enum CONSTANT_ATOM {

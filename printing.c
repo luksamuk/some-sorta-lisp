@@ -22,6 +22,18 @@ print_object(atom_table_t *table, list_area_t *area, lisp_ptr_t ptr)
     case TYPE_ATOM:
         printf("%s", get_atom_name(table, cont));
         break;
+    case TYPE_FUNCTION:
+        printf("#<FUNCTION {0x%05X}>", cont);
+        break;
+    case TYPE_SPECIAL:
+        printf("#<SPECIAL {0x%05X}>", cont);
+        break;
+    case TYPE_BUILTIN_FUNCTION:
+        printf("#<BUILTIN-FUNCTION {0x%05X}>", cont);
+        break;
+    case TYPE_BUILTIN_SPECIAL:
+        printf("#<BUILTIN-SPECIAL {0x%05X}>", cont);
+        break;
     case TYPE_CONS:
         putchar('(');
         print_list(table, area, cont);
@@ -31,6 +43,7 @@ print_object(atom_table_t *table, list_area_t *area, lisp_ptr_t ptr)
         /* print_object(table, area, area->area_ptr[cont].cdr); */
         /* putchar(')'); */
         break;
+        
     default: break;
     }
  }
