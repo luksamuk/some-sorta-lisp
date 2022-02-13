@@ -1,15 +1,15 @@
 #include "pointers.h"
 
 lisp_ptr_t
-make_pointer(lisp_ptr_tag_t tag, uint32_t value)
+make_pointer(lisp_ptr_tag_t tag, lisp_untptr_t value)
 {
-    uint32_t clean_value = value ^ (value & LISP_PTR_TAG_CLEAR_MASK);
+    lisp_untptr_t clean_value = value ^ (value & LISP_PTR_TAG_CLEAR_MASK);
     if((tag & TYPE_NUMBER) != 0) {
         // Compensate signum
-        uint32_t signum = value >> 31;
+        lisp_untptr_t signum = value >> 31;
         clean_value |= (signum << 19);
     }
-    uint32_t padded_tag = tag;
+    lisp_untptr_t padded_tag = tag;
     padded_tag = padded_tag << 24;
     return padded_tag | clean_value;
 }
@@ -20,13 +20,13 @@ get_ptr_tag(lisp_ptr_t ptr)
     return ptr >> 24;
 }
 
-uint32_t
+lisp_untptr_t
 get_ptr_content(lisp_ptr_t ptr)
 {
     return ptr ^ (ptr & LISP_PTR_TAG_CLEAR_MASK);
 }
 
-uint32_t
+lisp_untptr_t
 fix_numeric_content(lisp_ptr_t ptr_content)
 {
     // FIXME: This is incorrect and won't work properly.
