@@ -3,7 +3,7 @@
 #include <ctype.h>
 
 #include <stdio.h>
-#include "list.h"
+#include "aux_list.h"
 
 #include "reader.h"
 #include "atom.h"
@@ -11,7 +11,7 @@
 #include "list_area.h"
 #include "pointers.h"
 #include "vm.h"
-#include "vm_stack.h"
+#include "stack.h"
 
 void
 append_token(const char *token_buffer, list_t *list)

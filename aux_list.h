@@ -3,6 +3,11 @@
 
 #include <stdlib.h>
 
+// This is an auxiliar implementation of a linked list I had laying around,
+// and has nothing to do with the Lisp VM itself. I'm using it until I have
+// a proper string implementation. By that time I can have a token list into
+// the VM itself.
+
 typedef struct LIST_NODE_T
 {
     void               *info;

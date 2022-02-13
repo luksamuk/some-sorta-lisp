@@ -1,4 +1,4 @@
-#include "vm_stack.h"
+#include "stack.h"
 #include "atom_table.h"
 #include "pointers.h"
 

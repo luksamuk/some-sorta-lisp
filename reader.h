@@ -2,7 +2,7 @@
 #define LISP_READER_H
 
 #include "types.h"
-#include "list.h"
+#include "aux_list.h"
 #include "vm.h"
 
 void        tokenize(const char *text, list_t *list);

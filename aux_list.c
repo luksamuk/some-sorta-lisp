@@ -1,4 +1,4 @@
-#include "list.h"
+#include "aux_list.h"
 #include <stdlib.h>
 #include <string.h>
 

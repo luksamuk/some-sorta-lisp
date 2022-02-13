@@ -25,4 +25,4 @@ build: $(OBJ)
 	$(CC) $(CFLAGS) $(LFLAG) $< $(OUTFLAG) $@
 
 clean:
-	rm -f $(OBJ)
+	rm -f *.o $(BIN)
