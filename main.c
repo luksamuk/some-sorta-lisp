@@ -22,7 +22,6 @@ main()
     
     lisp_vm_t *vm = make_lisp_vm();
     init_lisp_vm(vm);
-    vm_load_file(vm, "init.l");
 
     char buffer[256];
     printf("Use Ctrl+D to abort.\n");
@@ -31,8 +30,11 @@ main()
         putchar('>');
         putchar(' ');
         char *result = fgets(buffer, sizeof buffer, stdin);
+        size_t len = strlen(buffer);
+        if(len > 0 && buffer[len - 1] == '\n')
+            buffer[len - 1] = '\0';
         if(!result) break;
-        if(!strcmp("#dump\n", result)) {
+        if(!strncmp("#dump", buffer, 5)) {
             putchar(10);
             printf("ATOM TABLE\n----------\n");
             print_atom_table(&vm->table);
@@ -40,9 +42,11 @@ main()
             printf("LIST AREA\n---------\n");
             print_list_area(&vm->area);
             putchar(10);
-        } else if(!strcmp("#echo\n", result)) {
+        } else if(!strncmp("#echo", buffer, 5)) {
             echo_p = !echo_p;
             printf("echo %s\n", echo_p ? "on" : "off");
+        } else if(!strncmp("#load ", buffer, 6)) {
+            vm_load_file(vm, result + 6);
         } else {
             lisp_ptr_t expr = read_expression(vm, buffer);
             if(echo_p) {
@@ -51,7 +55,7 @@ main()
                 putchar(10);
             }
             expr = get_car(&vm->area, get_ptr_content(expr));
-            lisp_ptr_t expr_eval = vm_proto_eval(vm, expr);
+            lisp_ptr_t expr_eval = vm_eval(vm, expr);
             print_object(&vm->table, &vm->area, expr_eval);
             putchar(10);
         }

@@ -34,8 +34,8 @@ init_lisp_vm(lisp_vm_t *vm)
         "cons",
         "cond",
         "lambda",
-        "label",
         "special",
+        "setq",
         "undefined",
         NULL
     };

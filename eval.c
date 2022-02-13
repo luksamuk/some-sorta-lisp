@@ -8,6 +8,7 @@
 #include "pointers.h"
 #include "reader.h"
 #include "printing.h"
+#include "primitives.h"
 
 lisp_ptr_t
 vm_lookup(lisp_vm_t *vm, lisp_ptr_t atom)
@@ -22,7 +23,7 @@ vm_lookup(lisp_vm_t *vm, lisp_ptr_t atom)
 }
 
 lisp_ptr_t
-vm_proto_eval(lisp_vm_t *vm, lisp_ptr_t expr)
+vm_eval(lisp_vm_t *vm, lisp_ptr_t expr)
 {
     // Can only handle self-evaluating stuff and quote.
     // otherwise spit expression in verbatim
@@ -35,10 +36,8 @@ vm_proto_eval(lisp_vm_t *vm, lisp_ptr_t expr)
     case TYPE_CONS:
         switch(get_car(&vm->area, get_ptr_content(expr))) {
         case TP_QUOTE:
-            return get_car(
-                &vm->area,
-                get_ptr_content(
-                    get_cdr(&vm->area, get_ptr_content(expr))));
+            return lisp_spcl_quote(
+                vm, TP_NIL, get_cdr(&vm->area, get_ptr_content(expr)));
         case TP_LAMBDA:
             // #<CONS (LAMBDA ARGS BODY)> => #<LAMBDA (ARGS BODY)>
             return make_pointer(
@@ -49,6 +48,9 @@ vm_proto_eval(lisp_vm_t *vm, lisp_ptr_t expr)
             return make_pointer(
                 TYPE_FUNCTION,
                 get_ptr_content(get_cdr(&vm->area, get_ptr_content(expr))));
+        case TP_SETQ:
+            return lisp_spcl_setq(
+                vm, TP_NIL, get_cdr(&vm->area, get_ptr_content(expr)));
         default:
             return expr;
         }
@@ -69,7 +71,7 @@ vm_load_file(lisp_vm_t *vm, const char *filename)
         while(expr != TP_NIL) {
             lisp_untptr_t content = get_ptr_content(expr);
             lisp_ptr_t result =
-                vm_proto_eval(vm, get_car(&vm->area, content));
+                vm_eval(vm, get_car(&vm->area, content));
             print_object(&vm->table, &vm->area, result);
             putchar(10);
             expr = get_cdr(&vm->area, content);
