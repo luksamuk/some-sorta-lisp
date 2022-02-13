@@ -53,14 +53,14 @@ parse(lisp_vm_t *vm, list_t *tokens)
 {
     size_t i = 0;
     lisp_ptr_t tp_underflow =
-        make_pointer(TYPE_ATOM, find_atom(&vm->table, "stack-underflow"));
+        make_pointer(TYPE_ATOM, find_atom(&vm->table, "underflow"));
     lisp_ptr_t tp_base = make_pointer(TYPE_ATOM, find_atom(&vm->table, "base"));
     lisp_ptr_t curr = TP_NIL;
     lisp_ptr_t root = TP_NIL;
 
     lisp_untptr_t stack_pos = vm->stack.last;
     if(vm_stack_push(vm, tp_base) != TP_T)
-        return make_pointer(TYPE_ATOM, find_atom(&vm->table, "stack-overflow"));
+        return make_pointer(TYPE_ATOM, find_atom(&vm->table, "overflow"));
     
     while(i < tokens->num_elements) {
         char *token = (char*)list_item_at(tokens, i);

@@ -54,7 +54,8 @@ main()
                 print_object(&vm->table, &vm->area, expr);
                 putchar(10);
             }
-            expr = get_car(&vm->area, get_ptr_content(expr));
+            
+            expr = vm_car(vm, expr);
             lisp_ptr_t expr_eval = vm_eval(vm, expr);
             print_object(&vm->table, &vm->area, expr_eval);
             putchar(10);

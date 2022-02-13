@@ -17,6 +17,9 @@ dbg: build
 release: CFLAGS = -O2 -Werror -Wextra
 release: build
 
+evdbg: CFLAGS += -DEDEBUG
+evdbg: dbg
+
 build: $(OBJ)
 	$(CC) $(CFLAGS) $^ $(OUTFLAG) $(BIN)
 
