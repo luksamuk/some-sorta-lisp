@@ -1,6 +1,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include "def.h"
+
 void
 dbg(const char *format, ...)
 {
@@ -9,5 +11,7 @@ dbg(const char *format, ...)
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
+#else
+    UNUSED(format);
 #endif
 }
