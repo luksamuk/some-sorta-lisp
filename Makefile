@@ -14,7 +14,7 @@ all: dbg
 dbg: CFLAGS += -DNDEBUG -Wall -Wextra
 dbg: build
 
-release: CFLAGS += -O2 -Werror -Wextra
+release: CFLAGS = -O2 -Werror -Wextra
 release: build
 
 build: $(OBJ)
