@@ -10,4 +10,6 @@
 #define LISP_PTR_TAG_CLEAR_MASK 0xFF000000
 #define LISP_STACK_SIZE            8388608 // 8MB stack
 
+#define UNUSED(x) (void)(x)
+
 #endif
