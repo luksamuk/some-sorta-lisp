@@ -48,6 +48,8 @@ main()
             printf("LIST AREA\n---------\n");
             print_list_area(&vm->area);
             putchar(10);
+        } if(!strncmp("#statistics", buffer, 11)) {
+            debrief_vm(vm);
         } else if(!strncmp("#echo", buffer, 5)) {
             echo_p = !echo_p;
             printf("echo %s\n", echo_p ? "on" : "off");

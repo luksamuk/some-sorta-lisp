@@ -29,6 +29,15 @@ lisp_ptr_t apply_primitive_fn(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl);
 lisp_ptr_t vm_make_bindings(lisp_vm_t *vm, lisp_ptr_t lambda_list, lisp_ptr_t argl);
 lisp_ptr_t vm_bind(lisp_vm_t *vm, lisp_ptr_t atom, lisp_ptr_t value);
 
+enum EV_LABEL_JMP {
+    LBL_EXPRESSION_ERROR,
+    LBL_DONE,
+    LBL_EVAL_ARGS,
+    LBL_ACCUMULATE_ARG,
+    LBL_ACCUMULATE_LAST_ARG,
+    LBL_EVAL_ASSIGN,
+};
+
 lisp_ptr_t
 vm_explicit_eval(lisp_vm_t *vm)
 {
@@ -42,28 +51,21 @@ vm_explicit_eval(lisp_vm_t *vm)
     // Helper atoms
     lisp_ptr_t
         tp_exp_err               = vm_get_atom(vm, "expression-error"),
-        tp_done                  = vm_get_atom(vm, "done"),
-        tp_eval_args             = vm_get_atom(vm, "eval-args"),
-        tp_accumulate_arg        = vm_get_atom(vm, "accumulate-arg"),
-        tp_accumulate_last_arg   = vm_get_atom(vm, "accumulate-last-arg"),
-        tp_unknown_function_type = vm_get_atom(vm, "unknown-function-type"),
-        tp_eval_assign           = vm_get_atom(vm, "eval-assign"),
-
         tp_lambda                = vm_get_atom(vm, "lambda"),
         tp_setq                  = vm_get_atom(vm, "setq");
 
     // We assume that EXP and ENV are in place.
-    reg->cont = tp_done;
+    reg->cont = LBL_DONE;
 
     /* UTILITY MACROS */
     
     // Macro for go-to's under CONT register
 #define GOTO_CONTINUE_REGISTER                                          \
-    if(reg->cont == tp_done)                goto done;                  \
-    if(reg->cont == tp_eval_args)           goto eval_args;             \
-    if(reg->cont == tp_accumulate_arg)      goto accumulate_arg;        \
-    if(reg->cont == tp_accumulate_last_arg) goto accumulate_last_arg;   \
-    if(reg->cont == tp_eval_assign)         goto eval_assign;           \
+    if(reg->cont == LBL_DONE)                goto done;                 \
+    if(reg->cont == LBL_EVAL_ARGS)           goto eval_args;            \
+    if(reg->cont == LBL_ACCUMULATE_ARG)      goto accumulate_arg;       \
+    if(reg->cont == LBL_ACCUMULATE_LAST_ARG) goto accumulate_last_arg;  \
+    if(reg->cont == LBL_EVAL_ASSIGN)         goto eval_assign;          \
     goto expression_error;
 
     // Common helper predicates
@@ -128,7 +130,7 @@ ev_setq:
     vm_stack_push(vm, reg->cont);
     vm_stack_push(vm, vm_cadr(vm, reg->exp));
     reg->exp = vm_caddr(vm, reg->exp);
-    reg->cont = tp_eval_assign;
+    reg->cont = LBL_EVAL_ASSIGN;
     goto eval_dispatch;
 
 eval_assign:
@@ -144,12 +146,10 @@ ev_application:
     edbg("ev-application\n");
     reg->unev = vm_cdr(vm, reg->exp);
     reg->exp  = vm_car(vm, reg->exp);
-
-    // Setup registers for recursive evaluation
     vm_stack_push(vm, reg->cont);
     vm_stack_push(vm, reg->env);
     vm_stack_push(vm, reg->unev);
-    reg->cont = tp_eval_args;
+    reg->cont = LBL_EVAL_ARGS;
     goto eval_dispatch;
 
 eval_args:
@@ -168,7 +168,7 @@ eval_arg_loop:
     if(LAST_OPERAND_P(reg->unev)) goto eval_last_arg;
     vm_stack_push(vm, reg->env);
     vm_stack_push(vm, reg->unev);
-    reg->cont = tp_accumulate_arg;
+    reg->cont = LBL_ACCUMULATE_ARG;
     goto eval_dispatch;
     
 accumulate_arg:
@@ -182,7 +182,7 @@ accumulate_arg:
     
 eval_last_arg:
     edbg("eval-last-arg\n");
-    reg->cont = tp_accumulate_last_arg;
+    reg->cont = LBL_ACCUMULATE_LAST_ARG;
     goto eval_dispatch;
     
 accumulate_last_arg:
@@ -220,7 +220,7 @@ done:
 expression_error:
     return tp_exp_err;
 unknown_function_type_error:
-    return tp_unknown_function_type;
+    return vm_get_atom(vm, "unknown-function-type");
 }
 
 lisp_ptr_t
