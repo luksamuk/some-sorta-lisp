@@ -21,13 +21,13 @@ jobs:
         run: make release
 
       - name: Generate tarball
-        run: tar zcvf lisp_linux.tar.gz ./lisp init.l
+        run: tar zcvf lisp.tar.gz ./lisp init.l
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: lisp_linux
-          path: ./lisp_linux.tar.gz
+          name: lisp_lin
+          path: ./lisp.tar.gz
 
   build_windows:
     runs-on: windows-latest
@@ -46,16 +46,14 @@ jobs:
       - name: Generate zip
         uses: vimtor/action-zip@v1
         with:
-          files: |
-            ./lisp.exe
-            init.l
-          dest: lisp_windows.zip
+          files: ./lisp.exe init.l
+          dest: lisp.zip
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: lisp_windows
-          path: ./lisp_windows.zip
+          name: lisp_win32
+          path: ./lisp.zip
 
   create_release:
     runs-on: ubuntu-latest
