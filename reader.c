@@ -165,19 +165,14 @@ slurp(const char *filename)
     FILE *file;
 
 #ifdef _WIN32
-    errno_t err;
-
-    if((err = fopen_s(&file, filename, "r")) != 0) {
-        dbg("Cannot open file \"%s\": %s\n", filename, strerror(err));
-        return NULL;
-    }
+    if(fopen_s(&file, filename, "r") != 0) {
 #else
     file = fopen(filename, "r");
     if(file == NULL) {
-        dbg("Cannot open file \"%s\"\n", filename);
-	return NULL;
-    }
 #endif
+        dbg("Cannot open file \"%s\"\n", filename);
+        return NULL;
+    }
     
     fseek(file, 0, SEEK_END);
     length = ftell(file);
