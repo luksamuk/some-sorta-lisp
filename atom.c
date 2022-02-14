@@ -14,7 +14,12 @@ make_atom_name(const char *given_name)
     size_t i;
     size_t num_chars = strlen(given_name);
     char *name = malloc((num_chars + 1) * sizeof(char));
+#ifdef _WIN32
+    strcpy_s(name, num_chars, given_name);
+#else
     strcpy(name, given_name);
+#endif
+    
     for(i = 0; i < num_chars; i++) {
         name[i] = toupper(name[i]);
     }
