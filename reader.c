@@ -171,7 +171,8 @@ slurp(const char *filename)
         return NULL;
     }
 #else
-    if((file = fopen(filename, "r") == NULL) {
+    file = fopen(filename, "r");
+    if(file == NULL) {
         dbg("Cannot open file \"%s\"\n", filename);
 	return NULL;
     }
