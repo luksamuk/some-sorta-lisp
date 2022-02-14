@@ -21,6 +21,12 @@ main()
            "Written by Lucas S. Vieira\n");
     
     lisp_vm_t *vm = make_lisp_vm();
+    
+    if(vm == NULL) {
+        dbg("Unable to initialize Virtual Machine!\n");
+        return 1;
+    }
+    
     init_lisp_vm(vm);
 
     char buffer[256];
