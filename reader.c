@@ -7,6 +7,7 @@
 #include "aux_list.h"
 
 #include "reader.h"
+#include "util.h"
 #include "atom.h"
 #include "atom_table.h"
 #include "list_area.h"
