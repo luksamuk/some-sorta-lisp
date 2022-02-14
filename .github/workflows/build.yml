@@ -13,9 +13,6 @@ jobs:
         uses: rlalik/setup-cpp-compiler@v1.1
         with:
           compiler: clang-latest
-      
-      - name: Cache compiler
-        uses: actions/cache@v2
         
       - name: Repository checkout
         uses: actions/checkout@v2
@@ -39,9 +36,6 @@ jobs:
         uses: rlalik/setup-cpp-compiler@v1.1
         with:
           compiler: clang-latest
-
-      - name: Cache compiler
-        uses: actions/cache@v2
 
       - name: Repository checkout
         uses: actions/checkout@v2
