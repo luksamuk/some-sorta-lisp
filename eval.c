@@ -271,6 +271,10 @@ apply_primitive_fn(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl)
 lisp_ptr_t
 vm_make_bindings(lisp_vm_t *vm, lisp_ptr_t lambda_list, lisp_ptr_t argl)
 {
+    // TODO: Make proper binding routine
+    UNUSED(vm);
+    UNUSED(lambda_list);
+    UNUSED(argl);
     return TP_NIL;
 }
 
