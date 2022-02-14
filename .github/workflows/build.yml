@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build binary
-        run: make release
+        run: make
 
       - name: Generate tarball
         run: tar zcvf lisp.tar.gz ./lisp init.l
@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build binary
-        run: make release
+        run: make
       
       - name: Prepare resources
         run: mv ./lisp ./lisp.exe
