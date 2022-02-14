@@ -32,48 +32,47 @@ jobs:
           name: lisp_linux
           path: ./lisp_linux.tar.gz
 
-    build_windows:
-      runs-on: windows-latest
-      steps:
-        - name: Install C compiler
-          uses: rlalik/setup-cpp-compiler@v1
-          with:
-            compiler: clang-latest
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Install C compiler
+        uses: rlalik/setup-cpp-compiler@v1
+        with:
+          compiler: clang-latest
 
-        - name: Cache compiler
-          uses: actions/cache@v2
+      - name: Cache compiler
+        uses: actions/cache@v2
 
-        - name: Repository checkout
-          uses: actions/checkout@v2
+      - name: Repository checkout
+        uses: actions/checkout@v2
 
-        - name: Build binary
-          run: make release
+      - name: Build binary
+        run: make release
 
-        - name: Generate zip
-          uses: vimtor/action-zip@v1
-          with:
-            files: |
-              ./lisp.exe
-              init.l
-            dest: lisp_windows.zip
+      - name: Generate zip
+        uses: vimtor/action-zip@v1
+        with:
+          files: |
+            ./lisp.exe
+            init.l
+          dest: lisp_windows.zip
 
-        - name: Upload artifacts
-          uses: actions/upload-artifact@v2
-          with:
-            name: lisp_windows
-            path: ./lisp_windows.zip
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: lisp_windows
+          path: ./lisp_windows.zip
 
-    create_release:
-      runs-on: ubuntu-latest
-      needs: [build_linux, build_windows]
-      steps:
-        - name: Recover artifacts
-          uses: actions/download-artifact@v2
-          
-        - name: Create release
-          id: release_step
-          uses: ncipollo/release-action@v1
-          with:
-            artifacts: "lisp_windows/lisp_windows.zip,lisp_linux/lisp_linux.tar.gz"
-            token: ${{ secrets.GITHUB_TOKEN }}
+  create_release:
+    runs-on: ubuntu-latest
+    needs: [build_linux, build_windows]
+    steps:
+      - name: Recover artifacts
+        uses: actions/download-artifact@v2
 
+      - name: Create release
+        id: release_step
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "lisp_windows/lisp_windows.zip,lisp_linux/lisp_linux.tar.gz"
+          token: ${{ secrets.GITHUB_TOKEN }}
