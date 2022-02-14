@@ -4,6 +4,7 @@
 #include "eval.h"
 #include "types.h"
 #include "util.h"
+#include "atom.h"
 #include "list_area.h"
 #include "pointers.h"
 #include "reader.h"
@@ -24,8 +25,9 @@ vm_lookup(lisp_vm_t *vm, lisp_ptr_t atom)
 }
 
 
-lisp_ptr_t apply_primitive_proc(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl);
+lisp_ptr_t apply_primitive_fn(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl);
 lisp_ptr_t vm_make_bindings(lisp_vm_t *vm, lisp_ptr_t lambda_list, lisp_ptr_t argl);
+lisp_ptr_t vm_bind(lisp_vm_t *vm, lisp_ptr_t atom, lisp_ptr_t value);
 
 lisp_ptr_t
 vm_explicit_eval(lisp_vm_t *vm)
@@ -44,7 +46,11 @@ vm_explicit_eval(lisp_vm_t *vm)
         tp_eval_args             = vm_get_atom(vm, "eval-args"),
         tp_accumulate_arg        = vm_get_atom(vm, "accumulate-arg"),
         tp_accumulate_last_arg   = vm_get_atom(vm, "accumulate-last-arg"),
-        tp_unknown_function_type = vm_get_atom(vm, "unknown-function-type");
+        tp_unknown_function_type = vm_get_atom(vm, "unknown-function-type"),
+        tp_eval_assign           = vm_get_atom(vm, "eval-assign"),
+
+        tp_lambda                = vm_get_atom(vm, "lambda"),
+        tp_setq                  = vm_get_atom(vm, "setq");
 
     // We assume that EXP and ENV are in place.
     reg->cont = tp_done;
@@ -52,11 +58,12 @@ vm_explicit_eval(lisp_vm_t *vm)
     /* UTILITY MACROS */
     
     // Macro for go-to's under CONT register
-#define GOTO_CONTINUE_REGISTER                                        \
-    if(reg->cont == tp_done) goto done;                               \
-    if(reg->cont == tp_eval_args) goto eval_args;                     \
-    if(reg->cont == tp_accumulate_arg) goto accumulate_arg;           \
-    if(reg->cont == tp_accumulate_last_arg) goto accumulate_last_arg; \
+#define GOTO_CONTINUE_REGISTER                                          \
+    if(reg->cont == tp_done)                goto done;                  \
+    if(reg->cont == tp_eval_args)           goto eval_args;             \
+    if(reg->cont == tp_accumulate_arg)      goto accumulate_arg;        \
+    if(reg->cont == tp_accumulate_last_arg) goto accumulate_last_arg;   \
+    if(reg->cont == tp_eval_assign)         goto eval_assign;           \
     goto expression_error;
 
     // Common helper predicates
@@ -77,19 +84,60 @@ vm_explicit_eval(lisp_vm_t *vm)
      && (FUNCTIONP(vm_lookup(vm, vm_car(vm, tptr))) \
          || (SPECIALP(vm_lookup(vm, vm_car(vm, tptr))))))
 #define LAST_OPERAND_P(tptr) (vm_cdr(vm, tptr) == TP_NIL)
+
+#define IS_SPECIAL_FORM(tptr, tpspcl) \
+    ((get_ptr_tag(tptr) == TYPE_CONS) && (vm_car(vm, tptr) == tpspcl))
+
+#define LAMBDA_P(tptr) IS_SPECIAL_FORM(tptr, tp_lambda)
+#define SETQ_P(tptr)   IS_SPECIAL_FORM(tptr, tp_setq)
+
     
     /* EVALUATION */
 eval_dispatch:
     edbg("eval-dispatch\n");
     // Entry point for evaluation
+    
     if(SELF_EVALUATINGP(reg->exp)) goto ev_self_eval;
     if(VARIABLEP(reg->exp))        goto ev_variable;
+
+    // Special forms
+    if(LAMBDA_P(reg->exp))         goto ev_lambda;
+    if(SETQ_P(reg->exp))           goto ev_setq;
+
+    // Application
     if(APPLICATIONP(reg->exp))     goto ev_application;
     goto expression_error;
 
 ev_self_eval:
     edbg("ev-self-eval\n");
     reg->val = reg->exp;
+    GOTO_CONTINUE_REGISTER;
+    
+ev_variable:
+    edbg("ev-variable\n");
+    reg->val = vm_lookup(vm, reg->exp);
+    GOTO_CONTINUE_REGISTER;
+
+ev_lambda:
+    edbg("ev-lambda\n");
+    reg->val = make_pointer(TYPE_FUNCTION, vm_cdr(vm, reg->exp));
+    GOTO_CONTINUE_REGISTER;
+
+ev_setq:
+    edbg("ev-setq\n");
+    vm_stack_push(vm, reg->cont);
+    vm_stack_push(vm, vm_cadr(vm, reg->exp));
+    reg->exp = vm_caddr(vm, reg->exp);
+    reg->cont = tp_eval_assign;
+    goto eval_dispatch;
+
+eval_assign:
+    edbg("ev-assign\n");
+    reg->exp = reg->val;
+    reg->val = vm_stack_pop(vm);
+    reg->val = vm_bind(vm, reg->val, reg->exp);
+    reg->cont = vm_stack_pop(vm);
+    if(reg->val == tp_exp_err) return tp_exp_err;
     GOTO_CONTINUE_REGISTER;
     
 ev_application:
@@ -103,12 +151,7 @@ ev_application:
     vm_stack_push(vm, reg->unev);
     reg->cont = tp_eval_args;
     goto eval_dispatch;
-    
-ev_variable:
-    edbg("ev-variable\n");
-    reg->val = vm_lookup(vm, reg->exp);
-    GOTO_CONTINUE_REGISTER;
-    
+
 eval_args:
     edbg("eval-args\n");
     reg->unev = vm_stack_pop(vm);
@@ -153,25 +196,24 @@ accumulate_last_arg:
     /* APPLICATION */
 apply_dispatch:
     edbg("apply-dispatch\n");
-    if(PRIMITIVE_FUNCTION_P(reg->fun)) goto primitive_apply;
+    if(PRIMITIVE_FUNCTION_P(reg->fun)) goto primitive_fn_apply;
     //if(PRIMITIVE_SPECIAL_P(reg->fun))  goto expression_error; // Unimplemented
-    if(COMPOUND_FUNCTION_P(reg->fun))  goto compound_apply;
-    //if(COMPOUND_SPECIAL_P(reg->fun))   goto expression_error; // Unimplemented
+    if(COMPOUND_FUNCTION_P(reg->fun))  goto compound_fn_apply;
     goto unknown_function_type_error;
     
-primitive_apply:
-    edbg("primitive-apply\n");
-    reg->val = apply_primitive_proc(vm, reg->fun, reg->argl);
+primitive_fn_apply:
+    edbg("primitive-fn-apply\n");
+    reg->val = apply_primitive_fn(vm, reg->fun, reg->argl);
     reg->cont = vm_stack_pop(vm);
     GOTO_CONTINUE_REGISTER;
     
-compound_apply:
-    edbg("compound-apply\n");
+compound_fn_apply:
+    edbg("compound-fn-apply\n");
     // Compound functions are pointers to a cons #<FUNCTION (ARGS . BODY)>
     reg->exp  = vm_cdr(vm, reg->fun);
     reg->env  = vm_make_bindings(vm, vm_car(vm, reg->fun), reg->argl);
     reg->cont = vm_stack_pop(vm);
-    goto eval_dispatch;
+    goto eval_dispatch;    
     
 done:
     return reg->val;
@@ -212,7 +254,7 @@ vm_load_file(lisp_vm_t *vm, const char *filename)
 
 
 lisp_ptr_t
-apply_primitive_proc(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl)
+apply_primitive_fn(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl)
 {
     lisp_ptr_t tp_plus = vm_get_atom(vm, "+");
     if(get_ptr_content(fun) == get_ptr_content(tp_plus)) {
@@ -230,4 +272,14 @@ lisp_ptr_t
 vm_make_bindings(lisp_vm_t *vm, lisp_ptr_t lambda_list, lisp_ptr_t argl)
 {
     return TP_NIL;
+}
+
+lisp_ptr_t
+vm_bind(lisp_vm_t *vm, lisp_ptr_t atom, lisp_ptr_t value)
+{
+    if((get_ptr_tag(atom) != TYPE_ATOM)
+       || (get_ptr_tag(value) == TYPE_UNDEFINED))
+        return vm_get_atom(vm, "expression-error");
+    bind_atom(&vm->table, get_ptr_content(atom), value);
+    return value;
 }
