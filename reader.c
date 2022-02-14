@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include <stdio.h>
 #include "aux_list.h"
@@ -160,10 +161,13 @@ slurp(const char *filename)
 {
     char *buffer = NULL;
     long length;
-    FILE *file = fopen(filename, "r");
+    FILE *file;
+    errno_t err;
 
-    if(!file)
+    if((err = fopen_s(&file, filename, "r")) != 0) {
+        dbg("Cannot open file \"%s\": %s\n", filename, strerror(err));
         return NULL;
+    }
 
     fseek(file, 0, SEEK_END);
     length = ftell(file);
