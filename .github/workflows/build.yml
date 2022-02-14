@@ -64,9 +64,9 @@ jobs:
       - name: Recover artifacts
         uses: actions/download-artifact@v2
 
-      - name: Create release
-        id: release_step
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "lisp_windows/lisp_windows.zip,lisp_linux/lisp_linux.tar.gz"
-          token: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Create release
+#         id: release_step
+#         uses: ncipollo/release-action@v1
+#         with:
+#           artifacts: "lisp_windows/lisp_windows.zip,lisp_linux/lisp_linux.tar.gz"
+#           token: ${{ secrets.GITHUB_TOKEN }}
