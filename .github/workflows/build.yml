@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install C compiler
-        uses: rlalik/setup-cpp-compiler@v1
+        uses: rlalik/setup-cpp-compiler@v1.1
         with:
           compiler: clang-latest
       
@@ -36,7 +36,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Install C compiler
-        uses: rlalik/setup-cpp-compiler@v1
+        uses: rlalik/setup-cpp-compiler@v1.1
         with:
           compiler: clang-latest
 
