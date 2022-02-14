@@ -44,7 +44,7 @@ jobs:
         run: make release
       
       - name: Prepare resources
-        run: rename lisp lisp.exe
+        run: mv ./lisp ./lisp.exe
 
       - name: Generate zip
         uses: vimtor/action-zip@v1
