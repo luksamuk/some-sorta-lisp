@@ -51,6 +51,7 @@ vm_explicit_eval(lisp_vm_t *vm)
     // Helper atoms
     lisp_ptr_t
         tp_exp_err               = vm_get_atom(vm, "expression-error"),
+	tp_quote                 = vm_get_atom(vm, "quote"),
         tp_lambda                = vm_get_atom(vm, "lambda"),
         tp_setq                  = vm_get_atom(vm, "setq");
 
@@ -74,7 +75,7 @@ vm_explicit_eval(lisp_vm_t *vm)
 #define PRIMITIVE_FUNCTION_P(tptr) (get_ptr_tag(tptr) == TYPE_BUILTIN_FUNCTION)
 #define PRIMITIVE_SPECIAL_P(tptr) (get_ptr_tag(tptr) == TYPE_BUILTIN_SPECIAL)
 #define COMPOUND_FUNCTION_P(tptr) (get_ptr_tag(tptr) == TYPE_FUNCTION)
-#define COMPOUND_SPECIAL_P(tptr) (get_ptr_tag(tptr) == TYPE_FUNCTION)
+#define COMPOUND_SPECIAL_P(tptr) (get_ptr_tag(tptr) == TYPE_FUNCTION) 
 #define FUNCTIONP(tptr) \
     ((get_ptr_tag(tptr) == TYPE_BUILTIN_FUNCTION) \
      || (get_ptr_tag(tptr) == TYPE_FUNCTION))
@@ -90,6 +91,7 @@ vm_explicit_eval(lisp_vm_t *vm)
 #define IS_SPECIAL_FORM(tptr, tpspcl) \
     ((get_ptr_tag(tptr) == TYPE_CONS) && (vm_car(vm, tptr) == tpspcl))
 
+#define QUOTE_P(tptr)  IS_SPECIAL_FORM(tptr, tp_quote)
 #define LAMBDA_P(tptr) IS_SPECIAL_FORM(tptr, tp_lambda)
 #define SETQ_P(tptr)   IS_SPECIAL_FORM(tptr, tp_setq)
 
@@ -103,6 +105,7 @@ eval_dispatch:
     if(VARIABLEP(reg->exp))        goto ev_variable;
 
     // Special forms
+    if(QUOTE_P(reg->exp))          goto ev_quote;
     if(LAMBDA_P(reg->exp))         goto ev_lambda;
     if(SETQ_P(reg->exp))           goto ev_setq;
 
@@ -118,6 +121,11 @@ ev_self_eval:
 ev_variable:
     edbg("ev-variable\n");
     reg->val = vm_lookup(vm, reg->exp);
+    GOTO_CONTINUE_REGISTER;
+
+ev_quote:
+    edbg("ev-quote\n");
+    reg->val = vm_cadr(vm, reg->exp);
     GOTO_CONTINUE_REGISTER;
 
 ev_lambda:
@@ -256,7 +264,11 @@ vm_load_file(lisp_vm_t *vm, const char *filename)
 lisp_ptr_t
 apply_primitive_fn(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl)
 {
-    lisp_ptr_t tp_plus = vm_get_atom(vm, "+");
+    // REMINDER: argl is inverted!
+    lisp_ptr_t
+	tp_typeof = vm_get_atom(vm, "typeof"),
+        tp_plus   = vm_get_atom(vm, "+");
+
     if(get_ptr_content(fun) == get_ptr_content(tp_plus)) {
         lisp_ptr_t result =
             make_pointer(
@@ -264,6 +276,10 @@ apply_primitive_fn(lisp_vm_t *vm, lisp_ptr_t fun, lisp_ptr_t argl)
                 get_ptr_content(vm_car(vm, argl)) +
                 get_ptr_content(vm_cadr(vm, argl)));
         return result;
+    } else if(get_ptr_content(fun) == get_ptr_content(tp_typeof)) {
+        lisp_ptr_t result =
+		vm_get_atom(vm, type_repr_str(get_ptr_tag(vm_car(vm, argl))));
+       return result;	
     }
     return TP_NIL;
 }

@@ -51,11 +51,15 @@ init_lisp_vm(lisp_vm_t *vm)
     bind_atom(&vm->table, 0, make_pointer(TYPE_ATOM, 0));
     bind_atom(&vm->table, 1, make_pointer(TYPE_ATOM, 1));
 
-    // Bind + as primitive procedure
+    // Bind primitive procedures
     lisp_ptr_t plus = vm_get_atom(vm, "+");
     bind_atom(&vm->table, get_ptr_content(plus),
               make_pointer(TYPE_BUILTIN_FUNCTION,
                            get_ptr_content(plus)));
+    lisp_ptr_t ttypeof = vm_get_atom(vm, "typeof");
+    bind_atom(&vm->table, get_ptr_content(ttypeof),
+	      make_pointer(TYPE_BUILTIN_FUNCTION,
+	                   get_ptr_content(ttypeof)));
 }
 
 void

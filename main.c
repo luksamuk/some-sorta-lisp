@@ -48,7 +48,7 @@ main()
             printf("LIST AREA\n---------\n");
             print_list_area(&vm->area);
             putchar(10);
-        } if(!strncmp("#statistics", buffer, 11)) {
+        } else if(!strncmp("#statistics", buffer, 11)) {
             debrief_vm(vm);
         } else if(!strncmp("#echo", buffer, 5)) {
             echo_p = !echo_p;
@@ -68,6 +68,7 @@ main()
             print_object(&vm->table, &vm->area, expr_eval);
             putchar(10);
         }
+	buffer[0] = '\0';
     }
     putchar(10);
     
