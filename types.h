@@ -1,7 +1,8 @@
 #ifndef LISP_TYPES_H
 #define LISP_TYPES_H
 
-#include <stdint.h>
+#include <u.h>
+#include <libc.h>
 #include "def.h"
 #include "constants.h"
 
@@ -10,16 +11,16 @@
 /* ==================================================================== */
 
 /// Type representing types in general
-typedef uint8_t datatype_t;
+typedef u8int datatype_t;
 
 /// Generic untyped pointer
-typedef uint32_t lisp_untptr_t;
+typedef u32int lisp_untptr_t;
 
 /// Typed pointer to object in list area
-typedef uint32_t lisp_ptr_t;
+typedef u32int lisp_ptr_t;
 
 /// MSB of typed pointer representing the type tag
-typedef uint8_t  lisp_ptr_tag_t;
+typedef u8int  lisp_ptr_tag_t;
 
 
 

@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
 #include "def.h"
 #include "util.h"
 #include "types.h"
@@ -17,26 +13,26 @@ init_list_area(list_area_t *area_ptr)
 void
 print_list_area(list_area_t *area)
 {
-    uint32_t current = 0;
+    u32int current = 0;
     while(current < area->last) {
         if(current % 100 == 0) {
-            printf("\n%6s | %14s | %14s\n",
-                   "ADDR", "CAR", "CDR");
+            print("\n%6s | %14s | %14s\n",
+                  "ADDR", "CAR", "CDR");
             int i = 0;
             while(i < 40) {
-                putchar('-');
+                print("-");
                 i++;
             }
-            putchar(10);
+            print("\n");
         }
 
         cell_t *cell = &area->area_ptr[current];
-        printf("%06X | %5s | %06X | %5s | %06X\n",
-               current,
-               type_repr_str(get_ptr_tag(cell->car)),
-               get_ptr_content(cell->car),
-               type_repr_str(get_ptr_tag(cell->cdr)),
-               get_ptr_content(cell->cdr));
+        print("%06X | %5s | %06X | %5s | %06X\n",
+              current,
+              type_repr_str(get_ptr_tag(cell->car)),
+              get_ptr_content(cell->car),
+              type_repr_str(get_ptr_tag(cell->cdr)),
+              get_ptr_content(cell->cdr));
         current++;
     }
 }
@@ -44,7 +40,7 @@ print_list_area(list_area_t *area)
 lisp_untptr_t
 make_cons_cell(list_area_t *area, lisp_ptr_t car, lisp_ptr_t cdr)
 {
-    uint32_t current = area->last;
+    u32int current = area->last;
     cell_t *cell_ptr = &area->area_ptr[current];
     area->last++;
 

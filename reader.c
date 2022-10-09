@@ -1,9 +1,6 @@
-#include <stddef.h>
-#include <string.h>
 #include <ctype.h>
-#include <errno.h>
+#include <bio.h>
 
-#include <stdio.h>
 #include "aux_list.h"
 
 #include "reader.h"
@@ -25,8 +22,8 @@ void
 tokenize(const char *text, list_t *list)
 {
     char buffer[2048];
-    size_t readpos = 0;
-    size_t bufferpos = 0;
+    long readpos = 0;
+    long bufferpos = 0;
     
     while(text[readpos] != '\0') {
         char chr = text[readpos];
@@ -53,7 +50,7 @@ tokenize(const char *text, list_t *list)
 lisp_ptr_t
 parse(lisp_vm_t *vm, list_t *tokens)
 {
-    size_t i = 0;
+    long i = 0;
     lisp_ptr_t tp_underflow =
         make_pointer(TYPE_ATOM, find_atom(&vm->table, "underflow"));
     lisp_ptr_t tp_base = make_pointer(TYPE_ATOM, find_atom(&vm->table, "base"));
@@ -160,27 +157,24 @@ read_expression(lisp_vm_t *vm, const char *text)
 char *
 slurp(const char *filename)
 {
-    char *buffer = NULL;
+    char *buffer = nil;
     long length;
-    FILE *file;
+    Biobuf *file;
 
-#ifdef _WIN32
-    if(fopen_s(&file, filename, "r") != 0) {
-#else
-    file = fopen(filename, "r");
-    if(file == NULL) {
-#endif
-        dbg("Cannot open file \"%s\"\n", filename);
-        return NULL;
+    file = Bopen(filename, OREAD);
+    if(file == nil) {
+        fprint(2, "Cannot open file \"%s\"\n", filename);
+        return nil;
     }
-    
+    // TODO
     fseek(file, 0, SEEK_END);
     length = ftell(file);
     fseek(file, 0, SEEK_SET);
     buffer = malloc(length);
     
-    if(buffer)
+    if(buffer) {
         fread(buffer, 1, length, file);
+    }
 
     fclose(file);
     return buffer;

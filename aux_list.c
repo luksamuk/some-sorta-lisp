@@ -1,21 +1,21 @@
+#include <u.h>
+#include <libc.h>
 #include "aux_list.h"
-#include <stdlib.h>
-#include <string.h>
 
 list_t*
-make_list(size_t element_size)
+make_list(long element_size)
 {
     if(element_size == 0)
-        return NULL;
+        return nil;
     
     list_t *list;
     list = malloc(sizeof(list_t));
 
-    if(!list) return NULL;
+    if(!list) return nil;
 
     list->element_size = element_size;
     list->num_elements = 0;
-    list->begin = list->end = NULL;
+    list->begin = list->end = nil;
 
     return list;
 }
@@ -46,7 +46,7 @@ list_append(list_t *list, void *item_ptr)
         itr->next->info = malloc(list->element_size);
         if(!itr->next->info) {
             free(itr->next);
-            itr->next = NULL;
+            itr->next = nil;
             return 0;
         }
 
@@ -54,7 +54,7 @@ list_append(list_t *list, void *item_ptr)
         list->end = itr;
     }
 
-    itr->next = NULL;
+    itr->next = nil;
     memcpy((char*)itr->info, (char*)item_ptr, list->element_size);
     list->num_elements++;
 
@@ -87,7 +87,7 @@ list_push(list_t *list, void *item_ptr)
 }
 
 int
-list_insert_at(list_t *list, void *item_ptr, size_t pos) {
+list_insert_at(list_t *list, void *item_ptr, long pos) {
     if(pos == 0) {
         return list_push(list, item_ptr);
     }
@@ -100,7 +100,7 @@ list_insert_at(list_t *list, void *item_ptr, size_t pos) {
     }
 
     list_node_t *itr, *new_node;
-    size_t i;
+    long i;
     for(i = 0, itr = list->begin;
         i < pos - 1;
         i++, itr = itr->next) {}
@@ -126,7 +126,7 @@ const void*
 list_peek(list_t *list)
 {
     if(!list || (list->num_elements == 0))
-        return NULL;
+        return nil;
     return list->begin->info;
 }
 
@@ -137,7 +137,7 @@ list_pop(list_t *list)
         return 0;
 
     if(list->begin == list->end) {
-        list->end = NULL;
+        list->end = nil;
     }
 
     list_node_t *itr = list->begin->next;
@@ -150,7 +150,7 @@ list_pop(list_t *list)
 }
 
 int
-list_remove_at(list_t *list, size_t pos)
+list_remove_at(list_t *list, long pos)
 {
     if(pos == 0) {
         return list_pop(list);
@@ -160,7 +160,7 @@ list_remove_at(list_t *list, size_t pos)
        return 0;
 
     list_node_t *itr, *new_next;
-    size_t i;
+    long i;
 
     for(i = 0, itr = list->begin;
         i < pos - 1;
@@ -191,7 +191,7 @@ list_dispose(list_t **list_ptr)
         list_pop(the_list);
 
     free(the_list);
-    *list_ptr = NULL;
+    *list_ptr = nil;
 
     return 1;
 }
@@ -202,27 +202,27 @@ list_map(list_t *list, void (*func)(void *const))
     if(!list || !func) return;
     
     list_node_t *itr;
-    for(itr = list->begin; itr != NULL; itr = itr->next) {
+    for(itr = list->begin; itr != nil; itr = itr->next) {
         func(itr->info);
     }
 }
 
 const void*
-list_item_at(list_t *list, size_t pos)
+list_item_at(list_t *list, long pos)
 {
     if(pos == 0) {
         return list_peek(list);
     }
     
     if(!list || (list->num_elements <= pos))
-        return NULL;
+        return nil;
 
     if(pos == (list->num_elements - 1)) {
         return list->end->info;
     }
     
     list_node_t *itr;
-    size_t i;
+    long i;
     for(i = 0, itr = list->begin;
         i < pos;
         i++, itr = itr->next) {}

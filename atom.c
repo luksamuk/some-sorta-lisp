@@ -1,7 +1,3 @@
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 
 #include "types.h"
@@ -11,8 +7,8 @@
 char *
 make_atom_name(const char *given_name)
 {
-    size_t i;
-    size_t num_chars = strlen(given_name);
+    long i;
+    long num_chars = strlen(given_name);
     char *name = malloc((num_chars + 1) * sizeof(char));
 #ifdef _WIN32
     strcpy_s(name, num_chars, given_name);

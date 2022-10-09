@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "printing.h"
 #include "atom.h"
 #include "atom_table.h"
@@ -10,38 +8,38 @@ void
 print_object(atom_table_t *table, list_area_t *area, lisp_ptr_t ptr)
 {
     lisp_ptr_tag_t tag  = get_ptr_tag(ptr);
-    uint32_t       cont = get_ptr_content(ptr);
+    u32int         cont = get_ptr_content(ptr);
 
     switch(tag) {
     case TYPE_UNDEFINED:
-        printf("<UNDEFINED>");
+        print("<UNDEFINED>");
         break;
     case TYPE_NUMBER:
-        printf("%d", cont);
+        print("%d", cont);
         break;
     case TYPE_ATOM:
-        printf("%s", get_atom_name(table, cont));
+        print("%s", get_atom_name(table, cont));
         break;
     case TYPE_FUNCTION:
-        printf("#<FUNCTION {0x%05X}>", cont);
+        print("#<FUNCTION {0x%05X}>", cont);
         break;
     case TYPE_SPECIAL:
-        printf("#<SPECIAL {0x%05X}>", cont);
+        print("#<SPECIAL {0x%05X}>", cont);
         break;
     case TYPE_BUILTIN_FUNCTION:
-        printf("#<BUILTIN-FUNCTION {0x%05X}>", cont);
+        print("#<BUILTIN-FUNCTION {0x%05X}>", cont);
         break;
     case TYPE_BUILTIN_SPECIAL:
-        printf("#<BUILTIN-SPECIAL {0x%05X}>", cont);
+        print("#<BUILTIN-SPECIAL {0x%05X}>", cont);
         break;
     case TYPE_CONS:
-        putchar('(');
+        print("(");
         print_list(table, area, cont);
         // Dotted pair notation
         /* print_object(table, area, area->area_ptr[cont].car); */
-        /* printf(" . "); */
+        /* print(" . "); */
         /* print_object(table, area, area->area_ptr[cont].cdr); */
-        /* putchar(')'); */
+        /* print(")"); */
         break;
         
     default: break;
@@ -60,13 +58,13 @@ print_list(atom_table_t *table, list_area_t *area, lisp_untptr_t untptr)
     lisp_untptr_t  cdr_cont = get_ptr_content(cdr);
     
     if(cdr_tag == TYPE_CONS) {
-        putchar(' ');
+        print(" ");
         print_list(table, area, get_ptr_content(cdr));
     } else if((cdr_tag == TYPE_ATOM) && (cdr_cont == 0))
-        putchar(')');
+        print(")");
     else {
-        printf(" . ");
+        print(" . ");
         print_object(table, area, cdr);
-        putchar(')');
+        print(")");
     }
 }

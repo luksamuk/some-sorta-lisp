@@ -1,7 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "vm.h"
 #include "util.h"
 #include "atom.h"
@@ -38,11 +34,11 @@ init_lisp_vm(lisp_vm_t *vm)
         "special",
         "setq",
         "undefined",
-        NULL
+        nil
     };
     
     const char **atom_ptr = PRIMITIVE_ATOMS;
-    while((*atom_ptr) != NULL) {
+    while((*atom_ptr) != nil) {
         make_atom(&vm->table, *atom_ptr);
         atom_ptr++;
     }
@@ -65,18 +61,18 @@ init_lisp_vm(lisp_vm_t *vm)
 void
 debrief_vm(lisp_vm_t *vm)
 {
-    size_t used_atom_table = vm->table.last * sizeof(atom_table_entry_t);
-    size_t used_list_area  = vm->area.last * sizeof(cell_t);
-    size_t total_size      = sizeof(atom_table_t) + sizeof(list_area_t);
+    long used_atom_table = vm->table.last * sizeof(atom_table_entry_t);
+    long used_list_area  = vm->area.last * sizeof(cell_t);
+    long total_size      = sizeof(atom_table_t) + sizeof(list_area_t);
     
-    printf("\nVM STATISTICS\n"
-           "-------------\n"
-           "ATOM TABLE: %10luB / %10luB (%u atoms)\n"
-           "LIST AREA:  %10luB / %10luB (%u cells)\n"
-           "TOTAL SIZE: %10luB / %10luB\n\n",
-           used_atom_table, sizeof(atom_table_t), vm->table.last,
-           used_list_area, sizeof(list_area_t), vm->area.last,
-           used_atom_table + used_list_area, total_size);
+    print("\nVM STATISTICS\n"
+          "-------------\n"
+          "ATOM TABLE: %10l B / %10l B (%u atoms)\n"
+          "LIST AREA:  %10l B / %10l B (%u cells)\n"
+          "TOTAL SIZE: %10l B / %10l B\n\n",
+          used_atom_table, sizeof(atom_table_t), vm->table.last,
+          used_list_area, sizeof(list_area_t), vm->area.last,
+          used_atom_table + used_list_area, total_size);
 }
 
 void

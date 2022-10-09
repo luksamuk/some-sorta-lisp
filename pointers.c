@@ -30,7 +30,7 @@ lisp_untptr_t
 fix_numeric_content(lisp_ptr_t ptr_content)
 {
     // FIXME: This is incorrect and won't work properly.
-    uint32_t signum = ptr_content >> 23;
+    u32int signum = ptr_content >> 23;
     ptr_content ^= 0x800000;
     ptr_content |= signum << 31;
     return ptr_content;

@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "eval.h"
 #include "types.h"
 #include "util.h"
